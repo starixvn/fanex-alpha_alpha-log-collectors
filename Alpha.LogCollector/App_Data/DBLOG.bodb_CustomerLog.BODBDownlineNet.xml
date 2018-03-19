@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Functions SiteId="105" SiteName="Bet Lists">
+  <Function Name="Login_Log">
+    <Setting Key="Acc_UserLog_LoginSelByDate" SpName="Acc_UserLog_LoginSelByDate" DbName="DBLOG.bodb_CustomerLog.BODBDownlineNet" Plain="0" />
+  </Function>
+</Functions>
