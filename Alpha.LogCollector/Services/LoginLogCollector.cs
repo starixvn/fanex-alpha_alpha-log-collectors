@@ -59,8 +59,13 @@
 
         private DateTime ComputeWhatDateToGetLogs(LoginLogDto latestLoginLog)
             => latestLoginLog != null
-                            ? (currentYear > latestLoginLog.LogDate ? currentYear : latestLoginLog.LogDate)
+                            ? GetLastestDate(latestLoginLog)
                             : currentYear;
+
+        private DateTime GetLastestDate(LoginLogDto latestLoginLog)
+            => currentYear > latestLoginLog.LogDate
+                                            ? currentYear
+                                            : latestLoginLog.LogDate;
 
         internal void InsertLogs(IEnumerable<LoginLogDto> loginLogs)
         {
