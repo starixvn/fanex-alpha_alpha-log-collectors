@@ -42,8 +42,7 @@
 
         internal void TransformLogs(DateTime lastTransformLogTime)
         {
-            var dateOfCurrentDate = this.currentDate.Date;
-            while (lastTransformLogTime.Date < dateOfCurrentDate)
+            while (lastTransformLogTime < currentDate)
             {
                 var loginLogs = GetLoginLogs(lastTransformLogTime);
                 InsertLogs(loginLogs);

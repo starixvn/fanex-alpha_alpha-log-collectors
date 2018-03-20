@@ -8,6 +8,7 @@
     using Alpha.LogCollector.Services;
     using Fanex.Data;
     using Fanex.Data.OldConnectionStringProvider;
+    using Fanex.Logging;
 
     public partial class LogCollectorService : ServiceBase
     {
@@ -31,6 +32,8 @@
                 .UseDefaultDbSettingProvider(resourcePath: AppSettings.StoredProcedurePath, enableWatching: false)
                 .Run();
 
+            LogService.Info($"Start Alpha.LogCollector at {DateTime.Now}");
+
             OnCollectingLogs();
 
             timer = new Timer(IntervalToGetLogsInHours);
@@ -49,6 +52,7 @@
         protected override void OnStop()
         {
             timer.Dispose();
+            LogService.Info($"End Alpha.LogCollector at {DateTime.Now}");
         }
     }
 }
