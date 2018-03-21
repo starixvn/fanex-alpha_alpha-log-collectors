@@ -43,10 +43,9 @@
 
         private void OnCollectingLogs()
         {
-            LogService.Info($"Collecting Logs at {DateTime.Now}");
             foreach (var collector in logCollectors)
             {
-                collector.Collect();
+                collector.Collect(DateTime.Now);
             }
         }
 

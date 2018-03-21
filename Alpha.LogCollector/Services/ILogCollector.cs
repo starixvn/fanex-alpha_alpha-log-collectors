@@ -4,6 +4,6 @@
 
     public interface ILogCollector
     {
-        void Collect();
+        void Collect(DateTime currentTime);
     }
 }

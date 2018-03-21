@@ -14,33 +14,28 @@
     {
         private const string elasticSearchType = "user_login_log";
         private readonly IDynamicRepository dynamicRepository;
-        private readonly DateTime currentTime;
         private readonly Nest.IElasticClient elasticClient;
         private readonly ILogger logger;
-        private readonly DateTime currentYear;
 
         public LoginLogCollector(
             IDynamicRepository dynamicRepository = null,
-            DateTime? currentDate = null,
             Nest.IElasticClient elasticClient = null,
             ILogger logger = null)
         {
             this.dynamicRepository = dynamicRepository ?? new DynamicRepository();
-            this.currentTime = currentDate ?? DateTime.Now;
-            this.currentYear = new DateTime(this.currentTime.Year, 1, 1);
             this.elasticClient = elasticClient ?? ElasticsearchClient.Instance;
             this.logger = logger ?? Logger.Log;
         }
 
-        public void Collect()
+        public void Collect(DateTime currentTime)
         {
             var latestLoginLog = GetLatestLoginLog();
             var lastTransformLogTime = ComputeWhatDateToGetLogs(latestLoginLog);
 
-            TransformLogs(lastTransformLogTime);
+            TransformLogs(lastTransformLogTime, currentTime);
         }
 
-        internal void TransformLogs(DateTime lastTransformLogTime)
+        internal void TransformLogs(DateTime lastTransformLogTime, DateTime currentTime)
         {
             while (lastTransformLogTime < currentTime)
             {
@@ -65,14 +60,9 @@
             => dynamicRepository.Fetch<LoginLogDto>(new GetLoginLogByDateCriteria(logDate));
 
         private DateTime ComputeWhatDateToGetLogs(LoginLogDto latestLoginLog)
-            => latestLoginLog != null
-                            ? GetLastestDate(latestLoginLog)
-                            : currentYear;
-
-        private DateTime GetLastestDate(LoginLogDto latestLoginLog)
-            => currentYear > latestLoginLog.LogDate
-                                            ? currentYear
-                                            : latestLoginLog.LogDate;
+            => latestLoginLog != null && latestLoginLog.LogDate > DateTime.MinValue
+                            ? latestLoginLog.LogDate
+                            : new DateTime(DateTime.Now.Year, 1, 1);
 
         internal void InsertLogs(IEnumerable<LoginLogDto> loginLogs)
         {
