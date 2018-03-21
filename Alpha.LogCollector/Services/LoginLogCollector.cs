@@ -49,8 +49,9 @@
                 if (loginLogs.Any())
                 {
                     InsertLogs(loginLogs);
+                    
+                    logger.Info($"Done from {lastTransformLogTime} to {loginLogs.Last().LogDate}, items: {loginLogs.Count()}");
 
-                    logger.Info($"Done for {lastTransformLogTime}, items: {loginLogs.Count()}");
                     lastTransformLogTime = loginLogs.Last().LogDate;
                 }
                 else
