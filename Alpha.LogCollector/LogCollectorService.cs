@@ -43,6 +43,7 @@
 
         private void OnCollectingLogs()
         {
+            LogService.Info($"Collecting Logs at {DateTime.Now}");
             foreach (var collector in logCollectors)
             {
                 collector.Collect();
@@ -51,6 +52,7 @@
 
         protected override void OnStop()
         {
+            timer.Stop();
             timer.Dispose();
             LogService.Info($"End Alpha.LogCollector at {DateTime.Now}");
         }
