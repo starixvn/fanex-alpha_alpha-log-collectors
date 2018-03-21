@@ -14,7 +14,7 @@
     {
         private const string elasticSearchType = "user_login_log";
         private readonly IDynamicRepository dynamicRepository;
-        private readonly DateTime currentDate;
+        private readonly DateTime currentTime;
         private readonly Nest.IElasticClient elasticClient;
         private readonly ILogger logger;
         private readonly DateTime currentYear;
@@ -26,8 +26,8 @@
             ILogger logger = null)
         {
             this.dynamicRepository = dynamicRepository ?? new DynamicRepository();
-            this.currentDate = currentDate ?? DateTime.Now;
-            this.currentYear = new DateTime(this.currentDate.Year, 1, 1);
+            this.currentTime = currentDate ?? DateTime.Now;
+            this.currentYear = new DateTime(this.currentTime.Year, 1, 1);
             this.elasticClient = elasticClient ?? ElasticsearchClient.Instance;
             this.logger = logger ?? Logger.Log;
         }
@@ -42,14 +42,21 @@
 
         internal void TransformLogs(DateTime lastTransformLogTime)
         {
-            while (lastTransformLogTime < currentDate)
+            while (lastTransformLogTime < currentTime)
             {
                 var loginLogs = GetLoginLogs(lastTransformLogTime);
-                InsertLogs(loginLogs);
 
-                logger.Info($"Done for {lastTransformLogTime}");
+                if (loginLogs.Any())
+                {
+                    InsertLogs(loginLogs);
 
-                lastTransformLogTime = lastTransformLogTime.AddDays(1);
+                    logger.Info($"Done for {lastTransformLogTime}, items: {loginLogs.Count()}");
+                    lastTransformLogTime = loginLogs.Last().LogDate;
+                }
+                else
+                {
+                    lastTransformLogTime = lastTransformLogTime.AddDays(1);
+                }
             }
         }
 

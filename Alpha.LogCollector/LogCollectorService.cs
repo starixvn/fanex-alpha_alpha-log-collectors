@@ -16,7 +16,7 @@
         {
             new LoginLogCollector()
         };
-        private const int IntervalToGetLogsInHours = 2 * 60 * 60 * 1000;
+        private const int IntervalToGetLogsInMinutes = 10 * 60 * 1000;
         private Timer timer;
 
         public LogCollectorService()
@@ -36,7 +36,7 @@
 
             OnCollectingLogs();
 
-            timer = new Timer(IntervalToGetLogsInHours);
+            timer = new Timer(IntervalToGetLogsInMinutes);
             timer.Elapsed += (sender, e) => OnCollectingLogs();
             timer.Start();
         }
