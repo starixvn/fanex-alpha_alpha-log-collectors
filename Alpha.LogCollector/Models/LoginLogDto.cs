@@ -28,8 +28,6 @@
 
         public string Username2 { get; }
 
-        public DateTime CreatedDate { get; }
-
         public DateTime LogDate { get; set; }
 
         public string Doing { get; }
