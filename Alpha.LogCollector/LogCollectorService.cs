@@ -34,11 +34,19 @@
 
             LogService.Info($"Start Alpha.LogCollector at {DateTime.Now}");
 
-            OnCollectingLogs();
+            try
+            {
 
-            timer = new Timer(IntervalToGetLogsInMinutes);
-            timer.Elapsed += (sender, e) => OnCollectingLogs();
-            timer.Start();
+                OnCollectingLogs();
+
+                timer = new Timer(IntervalToGetLogsInMinutes);
+                timer.Elapsed += (sender, e) => OnCollectingLogs();
+                timer.Start();
+            }
+            catch(Exception ex)
+            {
+                LogService.Error(ex.Message, ex);
+            }
         }
 
         private void OnCollectingLogs()
