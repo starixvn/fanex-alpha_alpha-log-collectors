@@ -46,13 +46,9 @@
                     InsertLogs(loginLogs);
                     
                     logger.Info($"Done from {lastTransformLogDate} to {loginLogs.Last().LogDate}, items: {loginLogs.Count()}");
+                }
 
-                    lastTransformLogDate = loginLogs.Last().LogDate.Date;
-                }
-                else
-                {
-                    lastTransformLogDate = lastTransformLogDate.AddDays(1);
-                }
+                lastTransformLogDate = lastTransformLogDate.AddDays(1);
             }
         }
 
