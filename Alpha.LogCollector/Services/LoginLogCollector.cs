@@ -30,28 +30,28 @@
         public void Collect(DateTime currentTime)
         {
             var latestLoginLog = GetLatestLoginLog();
-            var lastTransformLogTime = ComputeWhatDateToGetLogs(latestLoginLog);
+            var lastTransformLogDate = ComputeWhatDateToGetLogs(latestLoginLog);
 
-            TransformLogs(lastTransformLogTime, currentTime);
+            TransformLogs(lastTransformLogDate, currentTime);
         }
 
-        internal void TransformLogs(DateTime lastTransformLogTime, DateTime currentTime)
+        internal void TransformLogs(DateTime lastTransformLogDate, DateTime currentTime)
         {
-            while (lastTransformLogTime < currentTime)
+            while (lastTransformLogDate.Date < currentTime.Date)
             {
-                var loginLogs = GetLoginLogs(lastTransformLogTime);
+                var loginLogs = GetLoginLogs(lastTransformLogDate);
 
                 if (loginLogs.Any())
                 {
                     InsertLogs(loginLogs);
                     
-                    logger.Info($"Done from {lastTransformLogTime} to {loginLogs.Last().LogDate}, items: {loginLogs.Count()}");
+                    logger.Info($"Done from {lastTransformLogDate} to {loginLogs.Last().LogDate}, items: {loginLogs.Count()}");
 
-                    lastTransformLogTime = loginLogs.Last().LogDate;
+                    lastTransformLogDate = loginLogs.Last().LogDate.Date;
                 }
                 else
                 {
-                    lastTransformLogTime = lastTransformLogTime.AddDays(1);
+                    lastTransformLogDate = lastTransformLogDate.AddDays(1);
                 }
             }
         }
@@ -61,8 +61,8 @@
 
         private DateTime ComputeWhatDateToGetLogs(LoginLogDto latestLoginLog)
             => latestLoginLog != null && latestLoginLog.LogDate > DateTime.MinValue
-                            ? latestLoginLog.LogDate
-                            : new DateTime(DateTime.Now.Year, 1, 1);
+                            ? latestLoginLog.LogDate.Date
+                            : new DateTime(DateTime.Now.Year, 1, 1).Date;
 
         internal void InsertLogs(IEnumerable<LoginLogDto> loginLogs)
         {

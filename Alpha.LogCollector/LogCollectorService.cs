@@ -16,7 +16,7 @@
         {
             new LoginLogCollector()
         };
-        private const int IntervalToGetLogsInMinutes = 10 * 60 * 1000;
+        private const int IntervalToGetLogsInMinutes = 12 * 60 * 60 * 1000;
         private Timer timer;
 
         public LogCollectorService()
