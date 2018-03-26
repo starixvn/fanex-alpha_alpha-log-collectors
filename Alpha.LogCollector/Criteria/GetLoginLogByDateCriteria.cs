@@ -12,7 +12,7 @@
 
         public DateTime Date { get; }
 
-        public override string GetSettingKey() => "Acc_UserLog_LoginSelByDate";
+        public override string GetSettingKey() => "Age_UserLog_LoginSelByDate";
 
         public override bool IsValid() 
             => Date > DateTime.MinValue;
