@@ -4,10 +4,7 @@
     using System.Collections.Generic;
     using System.ServiceProcess;
     using System.Timers;
-    using Alpha.LogCollector.Configurations;
     using Alpha.LogCollector.Services;
-    using Fanex.Data;
-    using Fanex.Data.OldConnectionStringProvider;
     using Fanex.Logging;
 
     public partial class LogCollectorService : ServiceBase
@@ -16,6 +13,7 @@
         {
             new LoginLogCollector()
         };
+
         private const int IntervalToGetLogsInMinutes = 12 * 60 * 60 * 1000;
         private Timer timer;
 
@@ -26,24 +24,17 @@
 
         protected override void OnStart(string[] args)
         {
-            DbSettingProviderManager
-                .StartNewSession()
-                .Use(new OldConnectionStringProvider())
-                .UseDefaultDbSettingProvider(resourcePath: AppSettings.StoredProcedurePath, enableWatching: false)
-                .Run();
-
             LogService.Info($"Start Alpha.LogCollector at {DateTime.Now}");
 
             try
             {
-
                 OnCollectingLogs();
 
                 timer = new Timer(IntervalToGetLogsInMinutes);
                 timer.Elapsed += (sender, e) => OnCollectingLogs();
                 timer.Start();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LogService.Error(ex.Message, ex);
             }

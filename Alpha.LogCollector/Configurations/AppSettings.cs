@@ -13,7 +13,7 @@
 
             UriList = elasticsearchUriList.Split(',').Select(uriString => new Uri(uriString));
 
-            IsSSL = elasticsearchUriList.ToLowerInvariant().Contains("https");
+            IsSSL = elasticsearchUriList.IndexOf("https", StringComparison.InvariantCultureIgnoreCase) >= 0;
 
             ElasticsearchIndex = ConfigurationManager.AppSettings["ElasticsearchIndex"] ?? "tracking_activity";
 
@@ -21,7 +21,7 @@
 
             ElasticsearchIndexType = ConfigurationManager.AppSettings["ElasticsearchIndexType"] ?? "user_activity";
 
-            StoredProcedurePath = ConfigurationManager.AppSettings["StoredProcedurePath"];
+            LogCollectingApiBaseUrl = ConfigurationManager.AppSettings["LogCollectingApiBaseUrl"];
         }
 
         public static IEnumerable<Uri> UriList { get; internal set; }
@@ -34,6 +34,6 @@
 
         public static string ElasticsearchIndexType { get; internal set; }
 
-        public static string StoredProcedurePath { get; internal set; }
+        public static string LogCollectingApiBaseUrl { get; internal set; }
     }
 }

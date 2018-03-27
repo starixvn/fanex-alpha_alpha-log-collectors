@@ -3,28 +3,26 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Alpha.LogCollector.Criteria;
     using Alpha.LogCollector.Helpers;
     using Alpha.LogCollector.Models;
     using Elasticsearch.Net;
-    using Fanex.Data.Repository;
     using Fanex.Logging;
 
     public class LoginLogCollector : ILogCollector
     {
         private const string elasticSearchType = "user_login_log";
-        private readonly IDynamicRepository dynamicRepository;
         private readonly Nest.IElasticClient elasticClient;
         private readonly ILogger logger;
+        private readonly WebApiClient webApiClient;
 
         public LoginLogCollector(
-            IDynamicRepository dynamicRepository = null,
             Nest.IElasticClient elasticClient = null,
+            WebApiClient webApiClient = null,
             ILogger logger = null)
         {
-            this.dynamicRepository = dynamicRepository ?? new DynamicRepository();
             this.elasticClient = elasticClient ?? ElasticsearchClient.Instance;
             this.logger = logger ?? Logger.Log;
+            this.webApiClient = webApiClient ?? new WebApiClientImpl();
         }
 
         public void Collect(DateTime currentTime)
@@ -44,7 +42,7 @@
                 if (loginLogs.Any())
                 {
                     InsertLogs(loginLogs);
-                    
+
                     logger.Info($"Done from {lastTransformLogDate} to {loginLogs.Last().LogDate}, items: {loginLogs.Count()}");
                 }
 
@@ -52,8 +50,8 @@
             }
         }
 
-        private IEnumerable<LoginLogDto> GetLoginLogs(DateTime logDate)
-            => dynamicRepository.Fetch<LoginLogDto>(new GetLoginLogByDateCriteria(logDate));
+        private IEnumerable<LoginLogDto> GetLoginLogs(DateTime date)
+            => webApiClient.GetLogs<LoginLogDto>($"LogCollecting/LogIn?date={date}");
 
         private DateTime ComputeWhatDateToGetLogs(LoginLogDto latestLoginLog)
             => latestLoginLog != null && latestLoginLog.LogDate > DateTime.MinValue

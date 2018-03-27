@@ -1,7 +1,7 @@
-﻿namespace Alpha.LogCollector.Criteria
+﻿namespace Alpha.LogCollector.WebService.Criteria
 {
-    using Fanex.Data.Repository;
     using System;
+    using Fanex.Data.Repository;
 
     public class GetLoginLogByDateCriteria : CriteriaBase
     {
@@ -14,7 +14,7 @@
 
         public override string GetSettingKey() => "Age_UserLog_LoginSelByDate";
 
-        public override bool IsValid() 
+        public override bool IsValid()
             => Date > DateTime.MinValue;
     }
 }
