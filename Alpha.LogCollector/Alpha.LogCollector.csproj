@@ -97,6 +97,10 @@
     <Compile Include="Services\LoginLogCollector.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Alpha.LogCollector.exe.local.config">
+      <DependentUpon>App.config</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Alpha.LogCollector.exe.pro.config">
       <DependentUpon>App.config</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
