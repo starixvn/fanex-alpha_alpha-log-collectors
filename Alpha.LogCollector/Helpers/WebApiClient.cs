@@ -35,10 +35,8 @@
             {
                 return response.Content.ReadAsAsync<IEnumerable<T>>().Result;
             }
-            else
-            {
-                logger.Error(response.Content.ReadAsStringAsync().Result);
-            }
+
+            logger.Error(response.Content.ReadAsStringAsync().Result);
 
             return Enumerable.Empty<T>();
         }
