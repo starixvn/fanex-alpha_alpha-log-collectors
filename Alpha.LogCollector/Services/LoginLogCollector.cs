@@ -64,8 +64,16 @@
 
             foreach (var loginLog in loginLogs)
             {
-                loginLog.DomainName = new string(loginLog.DomainName.ToCharArray().Reverse().ToArray());
-                loginLog.Doing = new string(loginLog.Doing.ToCharArray().Reverse().ToArray());
+                if (!string.IsNullOrWhiteSpace(loginLog.DomainName))
+                {
+                    loginLog.DomainName = new string(loginLog.DomainName.ToCharArray().Reverse().ToArray());
+                }
+
+                if (!string.IsNullOrWhiteSpace(loginLog.Doing))
+                {
+                    loginLog.Doing = new string(loginLog.Doing.ToCharArray().Reverse().ToArray());
+                }
+
                 var response = elasticClient.Index(
                     loginLog,
                     i => i
