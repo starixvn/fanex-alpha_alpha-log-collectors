@@ -51,7 +51,7 @@
         }
 
         private IEnumerable<LoginLogDto> GetLoginLogs(DateTime date)
-            => webApiClient.GetLogs<LoginLogDto>($"LogCollecting/LogIn?date={date}").ToList();
+            => webApiClient.GetLogs<LoginLogDto>($"LogCollecting/LoginLog?date={date}").ToList();
 
         private DateTime ComputeWhatDateToGetLogs(LoginLogDto latestLoginLog)
             => latestLoginLog != null && latestLoginLog.LogDate > DateTime.MinValue

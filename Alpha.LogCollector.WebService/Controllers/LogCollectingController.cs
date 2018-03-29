@@ -19,7 +19,7 @@
         }
 
         [HttpGet]
-        public IEnumerable<LoginLogDto> Index(DateTime date)
+        public IEnumerable<LoginLogDto> LoginLog(DateTime date)
             => loginLogCollector.Collect(date);
     }
 }
