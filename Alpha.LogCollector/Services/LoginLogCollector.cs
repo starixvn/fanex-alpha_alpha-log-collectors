@@ -7,6 +7,7 @@
     using Alpha.LogCollector.Models;
     using Elasticsearch.Net;
     using Fanex.Logging;
+    using Fanex.Common;
 
     public class LoginLogCollector : ILogCollector
     {
@@ -43,7 +44,9 @@
                 {
                     InsertLogs(loginLogs);
 
-                    logger.Info($"Done from {lastTransformLogDate} to {loginLogs.Last().LogDate}, items: {loginLogs.Count()}");
+                    var logMessage = $"Done from {lastTransformLogDate} to {loginLogs.Last().LogDate}, items: {loginLogs.Count()}";
+                    logger.Info(logMessage);
+                    Console.WriteLine(logMessage);
                     lastTransformLogDate = loginLogs.Last().LogDate;
                 }
                 else
@@ -69,12 +72,34 @@
             {
                 if (!string.IsNullOrWhiteSpace(loginLog.DomainName))
                 {
-                    loginLog.DomainName = new string(loginLog.DomainName.ToCharArray().Reverse().ToArray());
+                    loginLog.DomainName = Cryptography.CfsEnCrypt(loginLog.DomainName);
+                }
+
+                if (!string.IsNullOrWhiteSpace(loginLog.DomainName) && loginLog.CountryCode.Equals("Viet Nam", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    loginLog.CountryCode = "N/A";
+                }
+
+                if (!string.IsNullOrWhiteSpace(loginLog.Username2))
+                {
+                    loginLog.Username2 = Cryptography.CfsEnCrypt(loginLog.Username2);
                 }
 
                 if (!string.IsNullOrWhiteSpace(loginLog.Doing))
                 {
-                    loginLog.Doing = new string(loginLog.Doing.ToCharArray().Reverse().ToArray());
+                    var colonIndex = loginLog.Doing.IndexOf(":", StringComparison.InvariantCultureIgnoreCase) + 1;
+                    var spaceIndex = loginLog.Doing.IndexOf(" ", StringComparison.InvariantCultureIgnoreCase);
+                    
+
+                    if (colonIndex > 0 && spaceIndex > colonIndex)
+                    {
+                        var username = loginLog.Doing.Substring(colonIndex, spaceIndex - colonIndex);
+                        loginLog.Doing = loginLog.Doing.Replace(username, Cryptography.CfsEnCrypt(username));
+                    }
+                    else
+                    {
+                        loginLog.Doing = new string(loginLog.Doing.ToCharArray().Reverse().ToArray());
+                    }
                 }
 
                 var response = elasticClient.Index(
