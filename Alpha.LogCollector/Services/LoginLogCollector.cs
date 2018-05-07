@@ -44,9 +44,12 @@
                     InsertLogs(loginLogs);
 
                     logger.Info($"Done from {lastTransformLogDate} to {loginLogs.Last().LogDate}, items: {loginLogs.Count()}");
+                    lastTransformLogDate = loginLogs.Last().LogDate;
                 }
-
-                lastTransformLogDate = lastTransformLogDate.AddDays(1);
+                else
+                {
+                    lastTransformLogDate = lastTransformLogDate.AddDays(1);
+                }
             }
         }
 
@@ -55,7 +58,7 @@
 
         private DateTime ComputeWhatDateToGetLogs(LoginLogDto latestLoginLog)
             => latestLoginLog != null && latestLoginLog.LogDate > DateTime.MinValue
-                            ? latestLoginLog.LogDate.AddDays(1).Date
+                            ? latestLoginLog.LogDate
                             : new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).Date;
 
         internal void InsertLogs(IEnumerable<LoginLogDto> loginLogs)

@@ -5,10 +5,13 @@
     using Criteria;
     using Fanex.Data.Repository;
     using Models;
+    using System.Linq;
 
     public class LoginLogCollector : ILogCollector<LoginLogDto>
     {
+        private static KeyValuePair<DateTime, IEnumerable<LoginLogDto>> cacheByDate;
         private readonly IDynamicRepository dynamicRepository;
+        private const int NumOfBatchingItems = 5000;
 
         public LoginLogCollector(IDynamicRepository dynamicRepository = null)
         {
@@ -16,6 +19,23 @@
         }
 
         public IEnumerable<LoginLogDto> Collect(DateTime date)
-         => dynamicRepository.Fetch<LoginLogDto>(new GetLoginLogByDateCriteria(date));
+        {
+            if (date.Date != cacheByDate.Key.Date)
+            {
+                cacheByDate = new KeyValuePair<DateTime, IEnumerable<LoginLogDto>>(
+                    date.Date,
+                    dynamicRepository
+                        .Fetch<LoginLogDto>(new GetLoginLogByDateCriteria(date))
+                        .OrderBy(loginLog => loginLog.LogDate)
+                        .Select(loginLog =>
+                        {
+                            loginLog.LogDate = loginLog.LogDate.AddMilliseconds(loginLog.LogDate.Millisecond);
+                            return loginLog;
+                        })
+                    );
+            }
+
+            return cacheByDate.Value.Where(loginLog => loginLog.LogDate > date).Take(NumOfBatchingItems);
+        }
     }
 }

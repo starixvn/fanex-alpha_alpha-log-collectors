@@ -28,7 +28,7 @@
 
         public string Username2 { get; }
 
-        public DateTime LogDate { get; }
+        public DateTime LogDate { get; set; }
 
         public string Doing { get; }
     }

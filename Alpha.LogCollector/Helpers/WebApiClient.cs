@@ -1,5 +1,6 @@
 ﻿namespace Alpha.LogCollector.Helpers
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Net.Http;
@@ -21,6 +22,7 @@
         {
             this.baseUrl = baseUrl ?? AppSettings.LogCollectingApiBaseUrl;
             this.logger = logger ?? Logger.Log;
+            httpClient.Timeout = new TimeSpan(0, 10, 0);
         }
 
         public IEnumerable<T> GetLogs<T>(string relativeUrl)
