@@ -4,7 +4,7 @@
 
     public class LoginLogDto
     {
-        public int LogId { get; }
+        public long LogId { get; }
 
         public int UserId { get; }
 
