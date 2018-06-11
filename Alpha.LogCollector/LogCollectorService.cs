@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.ServiceProcess;
+    using System.Threading.Tasks;
     using System.Timers;
     using Alpha.LogCollector.Services;
     using Fanex.Logging;
@@ -28,11 +29,11 @@
 
             try
             {
-                OnCollectingLogs();
-
                 timer = new Timer(IntervalToGetLogsInMinutes);
                 timer.Elapsed += (sender, e) => OnCollectingLogs();
                 timer.Start();
+
+                Task.Factory.StartNew(OnCollectingLogs);
             }
             catch (Exception ex)
             {
