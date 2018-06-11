@@ -1,11 +1,8 @@
 ﻿namespace Alpha.LogCollector.WebService
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Net.Http.Headers;
     using System.Web.Http;
-
+    using Alpha.LogCollector.WebService.Filters;
 
     public static class WebApiConfig
     {
@@ -23,6 +20,8 @@
             );
 
             config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
+
+            config.Filters.Add(new ExceptionFilter());
         }
     }
 }
