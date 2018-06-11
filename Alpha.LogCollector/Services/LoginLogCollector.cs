@@ -47,7 +47,7 @@
                     var logMessage = $"Done from {lastTransformLogDate} to {loginLogs.Last().LogDate}, items: {loginLogs.Count()}";
                     logger.Info(logMessage);
                     Console.WriteLine(logMessage);
-                    lastTransformLogDate = loginLogs.Last().LogDate;
+                    lastTransformLogDate = loginLogs.Last().LogDate.AddSeconds(2);
                 }
                 else
                 {
