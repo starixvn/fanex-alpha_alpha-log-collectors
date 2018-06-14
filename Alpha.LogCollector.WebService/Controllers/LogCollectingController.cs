@@ -19,7 +19,7 @@
         }
 
         [HttpGet]
-        public IEnumerable<LoginLogDto> LoginLog(DateTime date)
-            => loginLogCollector.Collect(date);
+        public IEnumerable<LoginLogDto> LoginLog(DateTime date, long logId)
+            => loginLogCollector.Collect(date, logId);
     }
 }

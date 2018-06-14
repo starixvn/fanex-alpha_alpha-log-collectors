@@ -28,41 +28,42 @@
 
         public void Collect(DateTime currentTime)
         {
-            var latestLoginLog = GetLatestLoginLog();
-            var lastTransformLogDate = ComputeWhatDateToGetLogs(latestLoginLog);
+            var lastLoginLog = GetLastLoginLogFromElastic();
+            lastLoginLog = ComputeWhatDateToGetLogs(lastLoginLog);
 
-            TransformLogs(lastTransformLogDate, currentTime);
+            TransformLogs(lastLoginLog, currentTime);
         }
 
-        internal void TransformLogs(DateTime lastTransformLogDate, DateTime currentTime)
+        internal void TransformLogs(LoginLogDto lastTransformLogDto, DateTime currentTime)
         {
-            while (lastTransformLogDate.Date < currentTime.Date)
+            while (lastTransformLogDto.LogDate.Date < currentTime.Date)
             {
-                var loginLogs = GetLoginLogs(lastTransformLogDate);
+                var loginLogs = GetLoginLogs(lastTransformLogDto);
 
                 if (loginLogs.Any())
                 {
                     InsertLogs(loginLogs);
 
-                    var logMessage = $"Done from {lastTransformLogDate} to {loginLogs.Last().LogDate}, items: {loginLogs.Count()}";
+                    var logMessage = $"Done from {lastTransformLogDto.LogDate} to {loginLogs.Last().LogDate}, items: {loginLogs.Count()}";
                     logger.Info(logMessage);
                     Console.WriteLine(logMessage);
-                    lastTransformLogDate = loginLogs.Last().LogDate.AddSeconds(2);
+                    lastTransformLogDto = loginLogs.Last();
                 }
                 else
                 {
-                    lastTransformLogDate = lastTransformLogDate.AddDays(1);
+                    lastTransformLogDto.LogDate = new DateTime(lastTransformLogDto.LogDate.Year, lastTransformLogDto.LogDate.Month, lastTransformLogDto.LogDate.Day).AddDays(1);
                 }
             }
         }
 
-        private IEnumerable<LoginLogDto> GetLoginLogs(DateTime date)
-            => webApiClient.GetLogs<LoginLogDto>($"LogCollecting/LoginLog?date={date}").ToList();
+        private IEnumerable<LoginLogDto> GetLoginLogs(LoginLogDto latestLogin)
+            => webApiClient.GetLogs<LoginLogDto>($"LogCollecting/LoginLog?date={latestLogin.LogDate.Date}&logId={latestLogin.LogId}").ToList();
 
-        private DateTime ComputeWhatDateToGetLogs(LoginLogDto latestLoginLog)
+        private LoginLogDto ComputeWhatDateToGetLogs(LoginLogDto latestLoginLog)
             => latestLoginLog != null && latestLoginLog.LogDate > DateTime.MinValue
-                            ? latestLoginLog.LogDate
-                            : new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).Date;
+                            ? latestLoginLog
+                            : new LoginLogDto { LogId = 0, LogDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).Date };
+
 
         internal void InsertLogs(IEnumerable<LoginLogDto> loginLogs)
         {
@@ -89,7 +90,7 @@
                 {
                     var colonIndex = loginLog.Doing.IndexOf(":", StringComparison.InvariantCultureIgnoreCase) + 1;
                     var spaceIndex = loginLog.Doing.IndexOf(" ", StringComparison.InvariantCultureIgnoreCase);
-                    
+
 
                     if (colonIndex > 0 && spaceIndex > colonIndex)
                     {
@@ -120,7 +121,7 @@
             }
         }
 
-        internal LoginLogDto GetLatestLoginLog()
+        internal LoginLogDto GetLastLoginLogFromElastic()
         {
             var searchResponse = elasticClient.Search<LoginLogDto>(
                 request => request
@@ -128,7 +129,6 @@
                             .Sort(item => item.Descending(f => f.LogDate))
                             .From(0)
                             .Take(1));
-
             return searchResponse.Documents.FirstOrDefault();
         }
     }

@@ -18,7 +18,7 @@
             this.dynamicRepository = dynamicRepository ?? new DynamicRepository();
         }
 
-        public IEnumerable<LoginLogDto> Collect(DateTime date)
+        public IEnumerable<LoginLogDto> Collect(DateTime date, long logId)
         {
             if (date.Date != cacheByDate.Key.Date)
             {
@@ -27,15 +27,10 @@
                     dynamicRepository
                         .Fetch<LoginLogDto>(new GetLoginLogByDateCriteria(date))
                         .OrderBy(loginLog => loginLog.LogDate)
-                        .Select(loginLog =>
-                        {
-                            loginLog.LogDate = loginLog.LogDate.AddMilliseconds(loginLog.LogDate.Millisecond);
-                            return loginLog;
-                        })
                     );
             }
 
-            return cacheByDate.Value.Where(loginLog => loginLog.LogDate > date).Take(NumOfBatchingItems);
+            return cacheByDate.Value.Where(loginLog => loginLog.LogId > logId).Take(NumOfBatchingItems);
         }
     }
 }

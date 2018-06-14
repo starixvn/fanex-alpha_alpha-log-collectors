@@ -5,6 +5,6 @@
 
     public interface ILogCollector<T>
     {
-        IEnumerable<T> Collect(DateTime date);
+        IEnumerable<T> Collect(DateTime date, long logId);
     }
 }

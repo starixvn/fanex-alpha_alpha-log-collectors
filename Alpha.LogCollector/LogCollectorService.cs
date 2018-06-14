@@ -43,9 +43,16 @@
 
         private void OnCollectingLogs()
         {
-            foreach (var collector in logCollectors)
+            try
             {
-                collector.Collect(DateTime.Now);
+                foreach (var collector in logCollectors)
+                {
+                    collector.Collect(DateTime.Now);
+                }
+            }
+            catch(Exception ex)
+            {
+                LogService.Error(ex.Message, ex);
             }
         }
 
